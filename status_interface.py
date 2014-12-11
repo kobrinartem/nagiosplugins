@@ -30,14 +30,14 @@ out, err = st.communicate()
 status=int(out.split(' ')[3])
 if not err:
   if status==1:
-    print "OK - UP"
-    sys.exit(0);
+    print "SNMP OK - UP"
+    raise SystemExit, OK
   elif status==2:
-    print "CRITICAL - DOWN"
+    print "SNMP CRITICAL - DOWN"
     raise SystemExit, CRITICAL
   else:
-    print "UNKNOWN - UNKNOWN Status"
+    print "SNMP UNKNOWN - UNKNOWN Status %d of the inerface"
     raise SystemExit, UNKNOWN
 if err:
-  print "CRITICAL - %s" % err
-  raise SystemExit, CRITICAL
+  print "SNMP UNKNOWN - %s" % err
+  raise SystemExit, UNKNOWN
