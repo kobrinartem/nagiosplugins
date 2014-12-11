@@ -3,6 +3,12 @@ import os, sys
 from optparse import OptionParser
 import subprocess
 
+# Exit statuses recognized by Nagios
+UNKNOWN = -1
+OK = 0
+WARNING = 1
+CRITICAL = 2
+
 # I'm going to be using optparse.OptionParser from now on.  It makes
 # command-line args a breeze.
 parser = OptionParser()
@@ -21,9 +27,17 @@ st=subprocess.Popen(["snmpget", "-v", "1", "-c", "public", options.hostname, opt
 out, err = st.communicate()
 #print "out:", out
 #print "err:", err
-
+status=int(out.split(' ')[3])
 if not err:
-  net_rate=int(out.split(' ')[3])/60/1024
-  print "OK - %i kByte/s " % net_rate
+  if status==1:
+    print "OK - UP"
+    sys.exit(0);
+  elif status==2:
+    print "CRITICAL - DOWN"
+    raise SystemExit, CRITICAL
+  else:
+    print "UNKNOWN - UNKNOWN Status"
+    raise SystemExit, UNKNOWN
 if err:
   print "CRITICAL - %s" % err
+  raise SystemExit, CRITICAL
